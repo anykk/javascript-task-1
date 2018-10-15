@@ -25,11 +25,13 @@ function abProblem(a, b) {
 function centuryByYearProblem(year) {
     if (typeof year !== 'number') {
         throw new TypeError('В качестве года передано не число!');
-    } else if (year < 0 || !Number.isInteger(year)) {
-        throw new RangeError('В качестве года передано отрицательное значение!');
-    } else {
-        return Math.ceil(year / 100);
     }
+
+    if (year < 0) {
+        throw new RangeError('В качестве года передано отрицательное значение!');
+    }
+
+    return Math.ceil(year / 100);
 }
 
 /**
@@ -42,15 +44,17 @@ function centuryByYearProblem(year) {
 function colorsProblem(hexColor) {
     if (typeof hexColor !== 'string') {
         throw new TypeError('Передана не строка!');
-    } else if (/^#[A-Fa-f0-9]{6}$/.test(hexColor)) {
-        return '(' + [
-            parseInt(hexColor.slice(1, 3), 16),
-            parseInt(hexColor.slice(3, 5), 16),
-            parseInt(hexColor.slice(5, 7), 16)
-        ].join(', ') + ')';
-    } else {
+    }
+
+    if (!/^#[A-Fa-f0-9]{6}$/.test(hexColor)) {
         throw new RangeError('Значения цвета выходят за пределы допустимых!');
     }
+
+    return '(' + [
+        parseInt(hexColor.slice(1, 3), 16),
+        parseInt(hexColor.slice(3, 5), 16),
+        parseInt(hexColor.slice(5, 7), 16)
+    ].join(', ') + ')';
 }
 
 /**
@@ -63,19 +67,21 @@ function colorsProblem(hexColor) {
 function fibonacciProblem(n) {
     if (typeof n !== 'number') {
         throw new TypeError('Передано не число!');
-    } else if (n <= 0 || !Number.isInteger(n)) {
-        throw new RangeError('Передано не целое положительное число!');
-    } else {
-        let a = 1;
-        let b = 1;
-        for (let i = 3; i <= n; i++) {
-            let c = a + b;
-            a = b;
-            b = c;
-        }
-
-        return b;
     }
+
+    if (n <= 0 || !Number.isInteger(n)) {
+        throw new RangeError('Передано не целое положительное число!');
+    }
+
+    let a = 1;
+    let b = 1;
+    for (let i = 3; i <= n; i++) {
+        let c = a + b;
+        a = b;
+        b = c;
+    }
+
+    return b;
 }
 
 /**
@@ -85,19 +91,18 @@ function fibonacciProblem(n) {
  * @returns {(Any[])[]} Транспонированная матрица размера NxM
  */
 function matrixProblem(matrix) {
-    if (!Array.isArray(matrix) ||
-        matrix.length === 0 ||
-        !Array.isArray(matrix[0])) {
-        throw new TypeError();
+    if (!Array.isArray(matrix)) {
+        throw new TypeError('Передан не массив!');
     }
 
-    const n = matrix.length;
-    const m = matrix[0].length;
+    if (!matrix.every(Array.isArray) ||
+        matrix.every(row => row.every(Array.isArray))) {
+        throw new TypeError('Передан не двумерный массив!');
+    }
 
-    for (let i = 1; i < n; i++) {
-        if (matrix[i].length !== m) {
-            throw new TypeError();
-        }
+    const n = matrix[0].length;
+    if (!matrix.every(row => row.length === n)) {
+        throw new TypeError('Передана некорректная матрица размера MxN!');
     }
 
     return matrix[0].map((column, i) => matrix.map(row => row[i]));
@@ -112,14 +117,14 @@ function matrixProblem(matrix) {
  * @returns {String} Число n в системе счисления targetNs
  */
 function numberSystemProblem(n, targetNs) {
-    if (typeof n !== 'number' ||
-        !Number.isInteger(targetNs)) {
+    if (typeof n !== 'number' || !Number.isInteger(targetNs)) {
         throw new TypeError('Переданы аргументы некорректного типа');
-    } else if (targetNs < 2 || targetNs > 36) {
-        throw new RangeError('Система счисления выходит за пределы значений!');
-    } else {
-        return n.toString(targetNs);
     }
+    if (targetNs < 2 || targetNs > 36) {
+        throw new RangeError('Система счисления выходит за пределы значений!');
+    }
+
+    return n.toString(targetNs);
 }
 
 /**
@@ -129,7 +134,7 @@ function numberSystemProblem(n, targetNs) {
  */
 function phoneProblem(phoneNumber) {
     if (typeof phoneNumber !== 'string') {
-        throw new TypeError();
+        throw new TypeError('Передана не строка!');
     }
 
     return /^8-800-[0-9]{3}(-[0-9]{2}){2}$/.test(phoneNumber);
@@ -145,8 +150,10 @@ function smilesProblem(text) {
     if (typeof text !== 'string') {
         throw new TypeError('Передана не строка!');
     }
+    const leftSmilesCount = (text.match(/\(-:/g) || []).length;
+    const rightSmilesCount = (text.match(/:-\)/g) || []).length;
 
-    return (text.match(/\(-:/g) || []).length + (text.match(/:-\)/g) || []).length;
+    return leftSmilesCount + rightSmilesCount;
 }
 
 /**
@@ -158,9 +165,11 @@ function smilesProblem(text) {
 function ticTacToeProblem(field) {
     const diagonal1 = field[0][0] === field[1][1] && field[1][1] === field[2][2];
     const diagonal2 = field[0][2] === field[1][1] && field[1][1] === field[2][0];
+
     if (diagonal1 || diagonal2) {
         return field[1][1];
     }
+
     for (let i = 0; i < field.length; i++) {
         const row = field[i][0] === field[i][1] && field[i][1] === field[i][2];
         const col = field[0][i] === field[1][i] && field[1][i] === field[2][i];
